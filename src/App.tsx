@@ -13,7 +13,6 @@ import { EducationMode } from "@/components/EducationMode";
 import { AdminDashboard } from "@/components/AdminDashboard";
 import { EnhancedAdminDashboard as AdminDashboardPage } from "@/components/EnhancedAdminDashboard";
 import { pwaService } from "@/lib/pwa";
-import { supabaseService } from "@/lib/supabase";
 
 const queryClient = new QueryClient();
 
@@ -154,29 +153,6 @@ const App = () => {
     
     // Initialize PWA service
     pwaService.initialize().catch(console.error);
-
-    // Initialize Supabase if configured
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    
-    console.log('🔍 Checking Supabase environment variables...');
-    console.log('VITE_SUPABASE_URL:', supabaseUrl ? '✅ Present' : '❌ Missing');
-    console.log('VITE_SUPABASE_ANON_KEY:', supabaseKey ? '✅ Present' : '❌ Missing');
-    
-    if (supabaseUrl && supabaseKey) {
-      console.log('🚀 Initializing Supabase with provided credentials...');
-      supabaseService.initialize({
-        url: supabaseUrl,
-        anonKey: supabaseKey,
-        encrypted: true
-      }).then(() => {
-        console.log('✅ Supabase initialization completed');
-      }).catch((error) => {
-        console.error('❌ Supabase initialization failed:', error);
-      });
-    } else {
-      console.warn('⚠️ Supabase environment variables not found - continuing without Supabase integration');
-    }
 
     // Handle PWA events
     const handleInstallAvailable = () => {
