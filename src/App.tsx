@@ -4,8 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect, lazy, Suspense } from "react";
 import Index from "./pages/Index";
-// import { MVPApp } from "./pages/MVPApp";
-import { LandingPage } from "./pages/LandingPage";
+import { MobileSplash } from "./pages/MobileSplash";
 import { AuthPage } from "./pages/Auth";
 import { PasswordResetPage } from "./pages/PasswordReset";
 import NotFound from "./pages/NotFound";
@@ -238,7 +237,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<MobileSplash />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/reset-password" element={<PasswordResetPage />} />
           <Route path="/app" element={<Suspense fallback={null}><MVPAppLazy /></Suspense>} />
