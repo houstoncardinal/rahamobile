@@ -7,6 +7,8 @@ import Index from "./pages/Index";
 import { MobileSplash } from "./pages/MobileSplash";
 import { AuthPage } from "./pages/Auth";
 import { PasswordResetPage } from "./pages/PasswordReset";
+import { TermsOfService } from "./pages/TermsOfService";
+import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import { EducationMode } from "@/components/EducationMode";
@@ -216,6 +218,8 @@ const App = () => {
           <Route path="/" element={<MobileSplash />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/reset-password" element={<PasswordResetPage />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/app" element={<Suspense fallback={null}><MVPAppLazy /></Suspense>} />
           <Route path="/full" element={<Index />} />
           <Route path="/admin" element={<AdminDashboardPage />} />
