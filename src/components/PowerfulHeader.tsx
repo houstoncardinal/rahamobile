@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import rahaLogo from '@/assets/raha-logo.png';
 
 interface PowerfulHeaderProps {
   onNewNote: () => void;
@@ -83,20 +84,7 @@ export function PowerfulHeader({
         <div className="flex items-center justify-between">
           {/* Left: Logo & Brand */}
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-teal-500 via-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg">
-                <Mic className="h-5 w-5 text-white" />
-              </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-slate-900 animate-pulse" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
-                Raha
-              </h1>
-              <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">
-                Enterprise Documentation Platform
-              </p>
-            </div>
+            <img src={rahaLogo} alt="Raha AI" className="h-10 w-auto object-contain" />
           </div>
 
 

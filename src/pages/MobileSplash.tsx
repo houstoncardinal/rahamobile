@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Shield, Mic, FileText, ArrowRight, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
+import rahaLogo from '@/assets/raha-logo.png';
 // Mobile-first splash / onboarding screen.
 // Auth is handled on the existing /auth page.
 
@@ -56,18 +56,8 @@ export function MobileSplash() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col">
       {/* Top brand header */}
       <header className="px-6 pt-10 pb-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary/80 shadow-xl shadow-primary/30">
-            <Shield className="h-6 w-6 text-primary-foreground" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-2xl font-semibold tracking-tight" style={{ color: "#60baa2" }}>
-              Raha
-            </span>
-            <span className="text-xs text-muted-foreground">
-              Clinical Documentation AI
-            </span>
-          </div>
+        <div className="flex items-center">
+          <img src={rahaLogo} alt="Raha AI Healthcare Documentation" className="h-12 w-auto object-contain" />
         </div>
 
         <button
