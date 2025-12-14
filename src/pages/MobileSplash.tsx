@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Shield, Mic, FileText, ArrowRight, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -138,7 +138,14 @@ export function MobileSplash() {
           </Button>
 
           <p className="pt-2 text-center text-[11px] leading-relaxed text-muted-foreground">
-            By continuing you agree to Raha&apos;s Terms of Service and Privacy Policy.
+            By continuing you agree to Raha&apos;s{" "}
+            <Link to="/terms" className="underline hover:text-foreground transition-colors">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link to="/privacy" className="underline hover:text-foreground transition-colors">
+              Privacy Policy
+            </Link>.
           </p>
         </div>
       </main>
