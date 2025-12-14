@@ -1,10 +1,17 @@
-import { supabaseService } from './supabase';
+/**
+ * Authentication Service
+ * Uses the existing profiles table structure for user management
+ * Designed for easy migration to Google Cloud/Workspace later
+ */
+
+import { supabase } from '@/integrations/supabase/client';
 
 export interface User {
   id: string;
   email: string;
   name?: string;
-  role?: 'admin' | 'nurse' | 'instructor' | 'student' | 'auditor';
+  role?: string;
+  organization?: string;
   avatar_url?: string;
   created_at: string;
   updated_at: string;
@@ -32,7 +39,7 @@ class AuthService {
   private async initialize() {
     try {
       // Get initial session
-      const { data: { session }, error } = await supabaseService.getSupabaseClient().auth.getSession();
+      const { data: { session }, error } = await supabase.auth.getSession();
 
       if (error) {
         console.error('Error getting session:', error);
@@ -48,12 +55,15 @@ class AuthService {
       }
 
       // Listen for auth changes
-      supabaseService.getSupabaseClient().auth.onAuthStateChange(async (event, session) => {
+      supabase.auth.onAuthStateChange(async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.email);
 
         if (session?.user) {
-          const user = await this.buildUserFromSession(session.user);
-          this.setAuthState({ user, isLoading: false, isAuthenticated: true });
+          // Use setTimeout to avoid potential deadlock
+          setTimeout(async () => {
+            const user = await this.buildUserFromSession(session.user);
+            this.setAuthState({ user, isLoading: false, isAuthenticated: true });
+          }, 0);
         } else {
           this.setAuthState({ user: null, isLoading: false, isAuthenticated: false });
         }
@@ -65,30 +75,41 @@ class AuthService {
   }
 
   private async buildUserFromSession(authUser: any): Promise<User> {
-    // First try to get user profile from our profiles table
-    let profile = await supabaseService.getUserProfile(authUser.id);
+    // Query profiles table by user_id (not id)
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', authUser.id)
+      .maybeSingle();
 
-    // If no profile exists, create one
+    if (error) {
+      console.error('Error fetching profile:', error);
+    }
+
+    // If no profile exists, create one via the trigger or return basic info
     if (!profile) {
-      const newProfile = {
+      // The handle_new_user trigger should create profiles automatically
+      // Return basic user info from auth metadata
+      return {
         id: authUser.id,
         email: authUser.email!,
-        name: authUser.user_metadata?.name || authUser.user_metadata?.full_name || 'User',
-        role: 'nurse' as const,
-        status: 'active' as const
+        name: authUser.user_metadata?.full_name || authUser.user_metadata?.name || 'User',
+        role: 'nurse',
+        avatar_url: authUser.user_metadata?.avatar_url,
+        created_at: authUser.created_at,
+        updated_at: authUser.updated_at || authUser.created_at
       };
-
-      profile = await supabaseService.upsertUserProfile(newProfile);
     }
 
     return {
       id: authUser.id,
       email: authUser.email!,
-      name: profile?.name || authUser.user_metadata?.name || authUser.user_metadata?.full_name,
-      role: profile?.role,
-      avatar_url: authUser.user_metadata?.avatar_url,
-      created_at: authUser.created_at,
-      updated_at: profile?.updated_at || authUser.updated_at
+      name: profile.full_name || authUser.user_metadata?.full_name,
+      role: profile.role || 'nurse',
+      organization: profile.organization,
+      avatar_url: profile.avatar_url || authUser.user_metadata?.avatar_url,
+      created_at: profile.created_at,
+      updated_at: profile.updated_at
     };
   }
 
@@ -115,19 +136,15 @@ class AuthService {
 
       console.log('🔐 Attempting sign in for:', email);
 
-      const { data, error } = await supabaseService.getSupabaseClient().auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
       if (error) {
         console.error('❌ Supabase auth error:', error);
-        console.error('Error code:', error.status);
-        console.error('Error message:', error.message);
-
         this.setAuthState({ ...this.authState, isLoading: false });
 
-        // Provide more specific error messages
         if (error.message?.includes('Invalid login credentials')) {
           return { user: null, error: 'Invalid email or password. Please check your credentials and try again.' };
         } else if (error.message?.includes('Email not confirmed')) {
@@ -145,7 +162,6 @@ class AuthService {
         return { user, error: null };
       }
 
-      console.warn('⚠️ Sign in returned no user data');
       return { user: null, error: 'Sign in failed - no user data returned' };
     } catch (error: any) {
       console.error('💥 Sign in exception:', error);
@@ -158,13 +174,14 @@ class AuthService {
     try {
       this.setAuthState({ ...this.authState, isLoading: true });
 
-      const { data, error } = await supabaseService.getSupabaseClient().auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            name: name || email.split('@')[0]
-          }
+            full_name: name || email.split('@')[0]
+          },
+          emailRedirectTo: `${window.location.origin}/app`
         }
       });
 
@@ -174,23 +191,15 @@ class AuthService {
       }
 
       if (data.user) {
-        // Create profile for new user
-        const profile = await supabaseService.upsertUserProfile({
-          id: data.user.id,
-          email: data.user.email!,
-          name: name || data.user.user_metadata?.name || email.split('@')[0],
-          role: 'nurse',
-          status: 'active'
-        });
-
+        // The handle_new_user trigger will create the profile
         const user: User = {
           id: data.user.id,
           email: data.user.email!,
-          name: profile?.name,
-          role: profile?.role,
+          name: name || data.user.user_metadata?.full_name,
+          role: 'nurse',
           avatar_url: data.user.user_metadata?.avatar_url,
           created_at: data.user.created_at,
-          updated_at: profile?.updated_at || data.user.updated_at
+          updated_at: data.user.updated_at || data.user.created_at
         };
 
         return { user, error: null };
@@ -207,10 +216,9 @@ class AuthService {
     try {
       this.setAuthState({ ...this.authState, isLoading: true });
 
-      // Use production domain for OAuth redirects
-      const redirectTo = 'https://rahanote.netlify.app/app';
+      const redirectTo = `${window.location.origin}/app`;
 
-      const { data, error } = await supabaseService.getSupabaseClient().auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo
@@ -222,7 +230,7 @@ class AuthService {
         return { user: null, error: error.message };
       }
 
-      // OAuth will redirect, so we don't need to return user here
+      // OAuth will redirect
       return { user: null, error: null };
     } catch (error: any) {
       this.setAuthState({ ...this.authState, isLoading: false });
@@ -232,7 +240,7 @@ class AuthService {
 
   async signOut(): Promise<{ error: string | null }> {
     try {
-      const { error } = await supabaseService.getSupabaseClient().auth.signOut();
+      const { error } = await supabase.auth.signOut();
 
       if (error) {
         return { error: error.message };
@@ -247,10 +255,9 @@ class AuthService {
 
   async resetPassword(email: string): Promise<{ error: string | null }> {
     try {
-      // Use production domain for password reset emails - redirect to dedicated password reset page
-      const redirectTo = 'https://rahanote.netlify.app/reset-password';
+      const redirectTo = `${window.location.origin}/reset-password`;
 
-      const { error } = await supabaseService.getSupabaseClient().auth.resetPasswordForEmail(email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo
       });
 
@@ -270,13 +277,31 @@ class AuthService {
     }
 
     try {
-      const profile = await supabaseService.updateUserProfile(this.authState.user.id, updates);
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: updates.name,
+          role: updates.role,
+          organization: updates.organization,
+          avatar_url: updates.avatar_url,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', this.authState.user.id)
+        .select()
+        .single();
 
-      if (profile) {
+      if (error) {
+        return { user: null, error: error.message };
+      }
+
+      if (data) {
         const updatedUser: User = {
           ...this.authState.user,
-          ...updates,
-          updated_at: profile.updated_at
+          name: data.full_name,
+          role: data.role,
+          organization: data.organization,
+          avatar_url: data.avatar_url,
+          updated_at: data.updated_at
         };
 
         this.setAuthState({
@@ -295,7 +320,7 @@ class AuthService {
 
   async updatePassword(newPassword: string): Promise<{ error: string | null }> {
     try {
-      const { error } = await supabaseService.getSupabaseClient().auth.updateUser({
+      const { error } = await supabase.auth.updateUser({
         password: newPassword
       });
 
@@ -311,7 +336,7 @@ class AuthService {
 
   async handlePasswordReset(accessToken: string, refreshToken: string): Promise<{ error: string | null }> {
     try {
-      const { error } = await supabaseService.getSupabaseClient().auth.setSession({
+      const { error } = await supabase.auth.setSession({
         access_token: accessToken,
         refresh_token: refreshToken
       });
