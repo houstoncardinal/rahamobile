@@ -14,7 +14,6 @@ import {
   Bell,
   Search,
   ChevronDown,
-  Stethoscope,
   BarChart3,
   Users,
   Keyboard,
@@ -26,6 +25,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import rahaLogo from '@/assets/raha-logo.png';
 
 interface MobileHeaderProps {
   currentScreen: 'home' | 'draft' | 'export' | 'settings';
@@ -82,13 +82,7 @@ export function MobileHeader({
           <div className="flex items-center justify-between">
             {/* Logo & App Name */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm">
-                <Stethoscope className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold text-slate-900">Raha</h1>
-                <p className="text-xs text-slate-500">Tihkn Breathing Space</p>
-              </div>
+              <img src={rahaLogo} alt="Raha AI" className="h-10 w-auto object-contain" />
             </div>
 
             {/* Right Actions */}

@@ -19,6 +19,7 @@ import { analyticsService } from '@/lib/analytics';
 import { educationService } from '@/lib/education';
 import { adminService } from '@/lib/admin';
 import heroImage from '@/assets/hero-nurse.jpg';
+import rahaLogo from '@/assets/raha-logo.png';
 
 const Index = () => {
   const [transcript, setTranscript] = useState('');
@@ -134,17 +135,7 @@ const Index = () => {
             {/* Logo and Title */}
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center shadow-lg">
-                  <Shield className="h-6 w-6 text-primary-foreground" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold text-gradient">
-                    Raha
-                  </h1>
-                  <p className="text-xs text-muted-foreground hidden sm:block">
-                    Clinical Documentation Platform
-                  </p>
-                </div>
+                <img src={rahaLogo} alt="Raha AI Healthcare Documentation" className="h-10 w-auto object-contain" />
               </div>
             </div>
 

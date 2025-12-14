@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, X, Mail, ArrowLeft } from 'lucide-react';
-
+import rahaLogo from '@/assets/raha-logo.png';
 // --- HELPER COMPONENTS (ICONS) ---
 
 const GoogleIcon = () => (
@@ -363,11 +363,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
           <div className="flex flex-col gap-6">
             {/* Logo/Brand */}
             <div className="flex items-center justify-center mb-4">
-              <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-lg animate-bounce-slow">
-                <svg className="w-8 h-8 text-primary-foreground" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-              </div>
+              <img src={rahaLogo} alt="Raha AI Healthcare Documentation" className="h-16 w-auto object-contain" />
             </div>
 
             <h1 className="animate-element animate-delay-100 text-4xl md:text-5xl font-semibold leading-tight text-center">

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Menu, Mic, Stethoscope, Shield, User, LogIn, LogOut, Settings,
+  Menu, Mic, Shield, User, LogIn, LogOut, Settings,
   FileText, Download, BarChart3, Users, BookOpen, History, HelpCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { SimpleThemeToggle } from '@/components/ThemeToggle';
-
+import rahaLogo from '@/assets/raha-logo.png';
 interface UserProfile {
   name: string;
   role: string;
@@ -65,10 +65,7 @@ export function EnhancedMobileHeader({
         <div className="flex items-center justify-between">
           {/* Logo and App Name - Clean */}
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 bg-gradient-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-              <Stethoscope className="h-5 w-5 text-white" />
-            </div>
-            <h1 className="text-lg font-bold text-foreground">Raha</h1>
+            <img src={rahaLogo} alt="Raha AI" className="h-9 w-auto object-contain" />
           </div>
 
           {/* Right Side - Clean Actions */}

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Menu, Mic, Stethoscope, Shield } from 'lucide-react';
+import { Menu, Mic, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-
+import rahaLogo from '@/assets/raha-logo.png';
 interface SimpleMobileHeaderProps {
   onNewNote?: () => void;
   isRecording?: boolean;
@@ -30,10 +30,7 @@ export function SimpleMobileHeader({
         <div className="flex items-center justify-between">
           {/* Logo and App Name - Compact */}
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md shadow-teal-500/25">
-              <Stethoscope className="h-4 w-4 text-white" />
-            </div>
-            <h1 className="text-base font-semibold text-slate-900">Raha</h1>
+            <img src={rahaLogo} alt="Raha AI" className="h-8 w-auto object-contain" />
           </div>
 
           {/* Right Side - Status and Actions */}
